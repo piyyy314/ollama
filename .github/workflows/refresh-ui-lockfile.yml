@@ -5,12 +5,13 @@ on:
       - fix/ui-package-lock-sync
     paths:
       - .github/workflows/refresh-ui-lockfile.yml
-      - app/ui/app/package.json
 permissions:
   contents: write
 jobs:
   refresh-ui-lockfile:
     runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: --max-old-space-size=8192
     steps:
       - uses: actions/checkout@v4
         with:
@@ -18,12 +19,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - name: Refresh and validate lockfile
+      - name: Refresh, install, build and test UI
         working-directory: app/ui/app
         run: |
           npm install --global npm@latest
           npm install --package-lock-only --ignore-scripts --no-audit --no-fund
           npm ci --ignore-scripts --no-audit --no-fund
+          npm run build
+          npm test -- --run
       - name: Commit generated lockfile to this repair branch
         run: |
           git config user.name "github-actions[bot]"
