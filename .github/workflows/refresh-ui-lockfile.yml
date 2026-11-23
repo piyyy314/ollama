@@ -5,6 +5,7 @@ on:
       - fix/ui-package-lock-sync
     paths:
       - .github/workflows/refresh-ui-lockfile.yml
+      - app/ui/app/package.json
 permissions:
   contents: write
 jobs:
