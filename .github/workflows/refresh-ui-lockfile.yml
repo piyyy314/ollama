@@ -1,0 +1,26 @@
+name: Refresh Ollama UI lockfile
+on:
+  push:
+    branches:
+      - fix/ui-package-lock-sync
+permissions:
+  contents: read
+jobs:
+  refresh-ui-lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Refresh lockfile from package.json
+        working-directory: app/ui/app
+        run: |
+          npm install --global npm@latest
+          npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+          npm ci --ignore-scripts --no-audit --no-fund
+      - uses: actions/upload-artifact@v4
+        with:
+          name: refreshed-ui-package-lock
+          path: app/ui/app/package-lock.json
+          if-no-files-found: error
